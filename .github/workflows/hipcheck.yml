@@ -1,0 +1,36 @@
+name: Hipcheck Scanner
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Hipcheck
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          source "$HOME/.cargo/env"
+          cargo install hipcheck --locked
+      - name: Run Hipcheck
+        run: |
+          source "$HOME/.cargo/env"
+          REPO_URL="https://github.com/${{ github.repository }}"
+          set +e
+          hipcheck check repo "${REPO_URL}" > results.txt 2>&1
+          EXIT_CODE=$?
+          set -e
+          echo "## Hipcheck Results" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat results.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          if [[ "$EXIT_CODE" -ne 0 ]]; then
+            echo "::error::Hipcheck flagged potential risks"
+            exit 1
+          fi
+      - name: Upload Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hipcheck-results
+          path: results.txt
