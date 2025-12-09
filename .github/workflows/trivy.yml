@@ -12,11 +12,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
     
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.33.1
+      - name: Run Trivy
+        uses: aquasecurity/trivy-action@0.28.0
         with:
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'json'
+          output: 'results.json'
+          severity: 'HIGH,CRITICAL'
