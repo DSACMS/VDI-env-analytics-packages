@@ -1,4 +1,4 @@
-name: build
+name: trivy
 on:
   push:
     branches:
@@ -11,12 +11,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Build an image from Dockerfile
-        run: docker build -t docker.io/DSACMS/vdi-env-analytics-packages:${{ github.sha }} .
+    
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.33.1
         with:
-          image-ref: 'docker.io/DSACMS/vdi-env-analytics-packages:${{ github.sha }}'
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true
