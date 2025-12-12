@@ -30,7 +30,7 @@ et_xmlfile==2.0.0
 executing==2.2.0
 fastjsonschema==2.21.2
 filelock==3.19.1
-fonttools==4.59.2
+fonttools==4.60.2
 fqdn==1.5.1
 greenlet==3.2.4
 h11==0.16.0
