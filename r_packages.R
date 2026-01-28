@@ -61,8 +61,10 @@ list_packages <- c(
 "glue",
 "compare",
 "purrr",
-"aws.s3"
+"aws.s3",
+"usethis"
 )
 
 install.packages(list_packages)
+
 
