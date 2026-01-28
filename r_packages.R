@@ -60,7 +60,9 @@ list_packages <- c(
 "tigris",
 "glue",
 "compare",
-"purrr"
+"purrr",
+"aws.s3"
 )
 
 install.packages(list_packages)
+
