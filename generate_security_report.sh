@@ -160,7 +160,7 @@ After a comprehensive review, **${PACKAGE}** has been [TODO: APPROVED / NOT APPR
 
 **1. OSS Scorecard:**
 - **Score:** ${SCORECARD_SCORE}
-- **Status:** [TODO: PASS / FAIL / REVIEW REQUIRED]
+- **Status:** [TODO: ✅ PASS / ❌ FAIL / ⚠️ REVIEW REQUIRED]
 - **Key Findings:**
   - Code Review: [TODO: Check GitHub Actions logs for details]
   - Maintained: [TODO: Check GitHub Actions logs for details]
@@ -172,11 +172,11 @@ After a comprehensive review, **${PACKAGE}** has been [TODO: APPROVED / NOT APPR
 - **HIGH:** [TODO: Check GitHub Actions logs for details]
 - **MEDIUM:** [TODO: Check GitHub Actions logs for details]
 - **LOW:** [TODO: Check GitHub Actions logs for details]
-- **Status:** [TODO: PASS / FAIL / REVIEW REQUIRED]
+- **Status:** [TODO: ✅ PASS / ❌ FAIL / ⚠️ REVIEW REQUIRED]
 - **Notes:** [TODO: Add any specific notes from the Trivy results]
 
 **3. Hipcheck Supply Chain Analysis:**
-- **Status:** [TODO: PASS / FAIL / REVIEW REQUIRED]
+- **Status:** [TODO: ✅ PASS / ❌ FAIL / ⚠️ REVIEW REQUIRED]
 - **Notes:** [TODO: Add any specific notes from the Hipcheck results]
 
 ### ✅ Local Checks (Manual/Automated)
