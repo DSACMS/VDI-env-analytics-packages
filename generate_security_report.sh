@@ -112,7 +112,7 @@ if [ -f "local_results/${PACKAGE}_local_check.json" ]; then
     echo "Extracting local check results from local_check.json..."
 
     # Get Cran Info
-    CRAN_ON_CRAN=$(jq -r 'local_checks.on_cran // "false"' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
+    CRAN_ON_CRAN=$(jq -r 'local_checks.cran.on_cran // "[TODO]"' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
     if [ "$CRAN_ON_CRAN" == "true" ]; then
         CRAN_STATUS="Yes"
         CRAN_STATUS_ICON="✅"
@@ -121,9 +121,9 @@ if [ -f "local_results/${PACKAGE}_local_check.json" ]; then
         CRAN_STATUS_ICON="❌"
     fi
 
-    CRAN_VERSION=$(jq -r 'local_checks.cran_version // "[TODO]"' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
+    CRAN_VERSION=$(jq -r 'local_checks.cran.version // "[TODO:]"' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
 
-    CRAN_CHECK_STATUS=$(jq -r 'local_checks.cran_check_status // "null"' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
+    CRAN_CHECK_STATUS=$(jq -r 'local_checks.cran.status // "[TODO:]"' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
     if [ "$CRAN_CHECK_STATUS" == "PASS" ]; then
         CRAN_STATUS_TEXT="✅ PASS"
     elif [ "$CRAN_CHECK_STATUS" == "WARNING" ]; then
@@ -139,7 +139,7 @@ if [ -f "local_results/${PACKAGE}_local_check.json" ]; then
     DIRECT_DEPS=$(jq -r 'local_checks.dependencies.direct // "[TODO]"' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
 
     # Determine dependency status
-    if [ "$TOTAL_DEPS" != "[TODO]" ] && [ "$DIRECT_DEPS" != "[TODO]" ]; then
+    if [ "$TOTAL_DEPS" != "[TODO:]" ] && [ "$DIRECT_DEPS" != "[TODO:]" ]; then
         if [ "$TOTAL_DEPS" -le 30 ]; then
             DEP_STATUS="✅ PASS"
         elif [ "$TOTAL_DEPS" -lt 50 ]; then
@@ -156,11 +156,11 @@ if [ -f "local_results/${PACKAGE}_local_check.json" ]; then
     HOOKS_COUNT=$(echo "$HOOKS_ARRAY" | jq -r 'length' 2>/dev/null || echo "0")
 
     if [ "$HOOKS_COUNT" -gt 0 ]; then
-        HOOKS_FOUND="No"
-        HOOKS_STATUS="✅ PASS - No hooks detected"
-    else
         HOOKS_LIST=$(echo "$HOOKS_ARRAY" | jq -r '.[]' 2>/dev/null)
         HOOKS_FOUND="Yes ($HOOKS_LIST)"
+    else
+        HOOKS_FOUND="No"
+        HOOKS_STATUS="✅ PASS - No hooks detected"
 
         # Check for red flags in hooks
         RED_FLAGS=$(jq -r 'local_checks.hooks.red_flags // [] | join(", ")' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
@@ -180,16 +180,16 @@ if [ -f "local_results/${PACKAGE}_local_check.json" ]; then
     # Determine license status and type
     if echo "$LICENSE" | grep -qi "MIT\|BSD\|Apache\|CCO"; then
         LICENSE_TYPE="Permissive"
-        if [ "$LICENSE_CHECK_STATUS" == "GREAT" ]; then
+        if [ "$LICENSE_CHECK_STATUS" == "PASS" ]; then
             LICENSE_STATUS="✅ GREAT - Permissive license"
-        elif [ "$LICENSE_CHECK_STATUS" == "ACCEPTABLE" ]; then
+        elif [ "$LICENSE_CHECK_STATUS" == "WARNING" ]; then
             LICENSE_STATUS="⚠️ ACCEPTABLE - Permissive but review specific license"
         else
             LICENSE_STATUS="[TODO: Check license status]"
         fi
     elif echo "$LICENSE" | grep -qi "GPL\|AGPL\|LGPL"; then
         LICENSE_TYPE="Copyleft"
-        if [ "$LICENSE_CHECK_STATUS" == "NOT_ACCEPTABLE" ]; then
+        if [ "$LICENSE_CHECK_STATUS" == "FAIL" ]; then
             LICENSE_STATUS="❌ NOT ACCEPTABLE - Copyleft license may not be suitable for all use cases"
         elif [ "$LICENSE_CHECK_STATUS" == "ACCEPTABLE" ]; then
             LICENSE_STATUS="⚠️ ACCEPTABLE - Copyleft license, review for compatibility with your use case"
@@ -202,7 +202,7 @@ if [ -f "local_results/${PACKAGE}_local_check.json" ]; then
     fi
 
     # Overall recommendation based on local checks (this is just a placeholder, you should use your judgment based on the specific results)
-    LOCAL_RECOMMENDATION=$(jq -r 'local_checks.recommendation // "[TODO]"' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
+    LOCAL_RECOMMENDATION=$(jq -r '.recommendation // "[TODO]"' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
     if [ "$LOCAL_RECOMMENDATION" == "LOOKS GOOD" ]; then
         OVERALL_RECOMMENDATION="✅ APPROVE - Local checks look good"
     elif [ "$LOCAL_RECOMMENDATION" == "REVIEW REQUIRED" ] || [ "$LOCAL_RECOMMENDATION" == "MANUAL REVIEW" ]; then
@@ -224,11 +224,11 @@ if [ -f "local_results/${PACKAGE}_credentials.txt" ]; then
 
     CRED_FINDINGS_COUNT=$(wc -l < "local_results/${PACKAGE}_credentials.txt" 2>/dev/null | tr -d ' ')
 
-    if [ "$CRED_FINDINGS_COUNT" -gt 0 ]; then
+    if [ "$CRED_FINDINGS_COUNT" -eq 0 ]; then
         CRED_FINDINGS_TEXT="None found"
         CRED_STATUS="✅ PASS - No potential credentials found"
     else
-        CRED_FINDINGS_TEXT="CRED_FINDINGS_COUNT potential credentials found, review for false positives"
+        CRED_FINDINGS_TEXT="${CRED_FINDINGS_COUNT} potential credentials found, review for false positives"
 
         # Check if it's a likely false positive (e.g. references to AWS_ACCESS_KEY_ID variable names without actual keys)
         if echo "PACKAGE" | grep -qi "aws"; then
