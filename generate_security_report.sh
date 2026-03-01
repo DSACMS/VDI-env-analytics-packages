@@ -112,7 +112,7 @@ if [ -f "local_results/${PACKAGE}_local_check.json" ]; then
     echo "Extracting local check results from local_check.json..."
 
     # Get Cran Info
-    CRAN_ON_CRAN=$(jq -r 'local_checks.cran.on_cran // "[TODO]"' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
+    CRAN_ON_CRAN=$(jq -r '.local_checks.cran.on_cran // "[TODO]"' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
     if [ "$CRAN_ON_CRAN" == "true" ]; then
         CRAN_STATUS="Yes"
         CRAN_STATUS_ICON="✅"
@@ -121,9 +121,13 @@ if [ -f "local_results/${PACKAGE}_local_check.json" ]; then
         CRAN_STATUS_ICON="❌"
     fi
 
-    CRAN_VERSION=$(jq -r 'local_checks.cran.version // "[TODO:]"' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
+    CRAN_VERSION=$(jq -r '.local_checks.cran.version // "[TODO]"' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
 
-    CRAN_CHECK_STATUS=$(jq -r 'local_checks.cran.status // "[TODO:]"' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
+    LAST_UPDATE=$(jq -r '.local_checks.cran.last_cran_release // "[TODO]"' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
+
+    DAYS_SINCE_UPDATE=$(jq -r '.local_checks.cran.days_since_release // "[TODO]"' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
+
+    CRAN_CHECK_STATUS=$(jq -r '.local_checks.cran.status // "[TODO]"' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
     if [ "$CRAN_CHECK_STATUS" == "PASS" ]; then
         CRAN_STATUS_TEXT="✅ PASS"
     elif [ "$CRAN_CHECK_STATUS" == "WARNING" ]; then
@@ -135,11 +139,11 @@ if [ -f "local_results/${PACKAGE}_local_check.json" ]; then
     fi
 
     # Get dependency info
-    TOTAL_DEPS=$(jq -r 'local_checks.dependencies.total // "[TODO]"' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
-    DIRECT_DEPS=$(jq -r 'local_checks.dependencies.direct // "[TODO]"' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
+    TOTAL_DEPS=$(jq -r '.local_checks.dependencies.total // "[TODO]"' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
+    DIRECT_DEPS=$(jq -r '.local_checks.dependencies.direct // "[TODO]"' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
 
     # Determine dependency status
-    if [ "$TOTAL_DEPS" != "[TODO:]" ] && [ "$DIRECT_DEPS" != "[TODO:]" ]; then
+    if [ "$TOTAL_DEPS" != "[TODO]" ] && [ "$DIRECT_DEPS" != "[TODO]" ]; then
         if [ "$TOTAL_DEPS" -le 30 ]; then
             DEP_STATUS="✅ PASS"
         elif [ "$TOTAL_DEPS" -lt 50 ]; then
@@ -152,18 +156,15 @@ if [ -f "local_results/${PACKAGE}_local_check.json" ]; then
     fi
 
     # Get hooks info
-    HOOKS_ARRAY=$(jq -r 'local_checks.hooks.hooks_found // []' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
+    HOOKS_ARRAY=$(jq -r '.local_checks.hooks.hooks_found // []' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
     HOOKS_COUNT=$(echo "$HOOKS_ARRAY" | jq -r 'length' 2>/dev/null || echo "0")
 
     if [ "$HOOKS_COUNT" -gt 0 ]; then
         HOOKS_LIST=$(echo "$HOOKS_ARRAY" | jq -r '.[]' 2>/dev/null)
         HOOKS_FOUND="Yes ($HOOKS_LIST)"
-    else
-        HOOKS_FOUND="No"
-        HOOKS_STATUS="✅ PASS - No hooks detected"
 
-        # Check for red flags in hooks
-        RED_FLAGS=$(jq -r 'local_checks.hooks.red_flags // [] | join(", ")' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
+         # Check for red flags in hooks
+        RED_FLAGS=$(jq -r '.local_checks.hooks.red_flags // [] | join(", ")' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
         if [ -n "$RED_FLAGS" ] && [ "$RED_FLAGS" != "[]"] && [ "$RED_FLAGS" != "" ]; then
             HOOKS_STATUS="❌ FAIL - Malicious hooks detected"
             HOOKS_RED_FLAG="Yes ($RED_FLAGS)"
@@ -171,11 +172,14 @@ if [ -f "local_results/${PACKAGE}_local_check.json" ]; then
             HOOKS_STATUS="✅ PASS - Hooks found but no red flags"
             HOOKS_RED_FLAG="No red flags detected"
         fi
+    else
+        HOOKS_FOUND="No"
+        HOOKS_STATUS="✅ PASS - No hooks detected"
     fi
 
     # Get license info
-    LICENSE=$(jq -r 'local_checks.license.license // "[TODO]"' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
-    LICENSE_CHECK_STATUS=$(jq -r 'local_checks.license.status // "null"' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
+    LICENSE=$(jq -r '.local_checks.license.license // "[TODO]"' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
+    LICENSE_CHECK_STATUS=$(jq -r '.local_checks.license.status // "null"' "local_results/${PACKAGE}_local_check.json" 2>/dev/null)
 
     # Determine license status and type
     if echo "$LICENSE" | grep -qi "MIT\|BSD\|Apache\|CCO"; then
@@ -231,7 +235,7 @@ if [ -f "local_results/${PACKAGE}_credentials.txt" ]; then
         CRED_FINDINGS_TEXT="${CRED_FINDINGS_COUNT} potential credentials found, review for false positives"
 
         # Check if it's a likely false positive (e.g. references to AWS_ACCESS_KEY_ID variable names without actual keys)
-        if echo "PACKAGE" | grep -qi "aws"; then
+        if echo "$PACKAGE" | grep -qi "aws"; then
             CRED_STATUS="⚠️ FLAG FOR SECOND REVIEW - Potential false positives expected for AWS packages, review findings carefully"
         else
             CRED_STATUS="❌ FAIL - Potential credentials found, review findings"
@@ -313,6 +317,7 @@ After a comprehensive review, **${PACKAGE}** has been [TODO: APPROVED / NOT APPR
 **4. CRAN Status:**
 - **On CRAN:** ${CRAN_STATUS}
 - **Last Update:** ${LAST_UPDATE}
+- **Days Since Last Update:** ${DAYS_SINCE_UPDATE}
 - **Status:** ${CRAN_STATUS_TEXT}
 
 **5. Dependency Analysis:**
@@ -413,7 +418,7 @@ cat >> "$REPORT_FILE" << EOF
 
 ---
 
-## Decision: [TODO: ✅ APPROVE / ❌ DISAPPROVE]
+## Decision: ${OVERALL_RECOMMENDATION}
 
 **Reasoning:**
 [TODO: Add a brief explanation of the decision based on the findings]

@@ -1,6 +1,7 @@
 #!/usr/bin/env Rscript
 # local_package_check.R
-# Local security checks to complement your existing GitHub Actions (scorecard, trivy, hipcheck)
+# Local security checks to complement your existing 
+#GitHub Actions (scorecard, trivy, hipcheck)
 # Run this AFTER your GitHub Actions complete
 
 library(jsonlite)
@@ -37,10 +38,27 @@ check_package_locally <- function(package_name) {
       cat("✅ Package found on CRAN\n")
       cat("   Version:", pkg_info["Version"], "\n")
       cat("   Maintainer:", pkg_info["Maintainer"], "\n")
-     
+
+      # Check if package is recently updated
+      cran_db <- tools::CRAN_package_db()
+      pkg_row <- cran_db[cran_db$Package == package_name, ]
+
+      if (nrow(pkg_row) > 0 && !is.na(pkg_row$Published)) {
+        last_cran_release <- pkg_row$Published
+        cat("   Last CRAN release:", last_cran_release, "\n")
+
+        published_date <- as.Date(substr(last_cran_release, 1, 10))
+        days_since_release <- as.numeric(Sys.Date() - published_date)
+        cat("   Days since last release:", days_since_release, "\n")
+      } else {
+        cat("   Could not determine last CRAN release date\n")
+      }
+           
       results$local_checks$cran <- list(
         on_cran = TRUE,
         version = pkg_info["Version"],
+        last_cran_release = last_cran_release,
+        days_since_release = days_since_release,
         status = "PASS"
       )
     } else {
