@@ -21,7 +21,7 @@ cloudpickle==3.0.0
 colorama==0.4.6
 comm==0.2.3
 contourpy==1.3.3
-cryptography==45.0.6
+cryptography==46.0.7
 cycler==0.12.1
 debugpy==1.8.16
 decorator==5.2.1
@@ -29,7 +29,7 @@ defusedxml==0.7.1
 et_xmlfile==2.0.0
 executing==2.2.0
 fastjsonschema==2.21.2
-filelock==3.20.1
+filelock==3.20.3
 fonttools==4.60.2
 fqdn==1.5.1
 greenlet==3.2.4
@@ -77,7 +77,7 @@ mistune==3.1.4
 more-itertools==10.7.0
 narwhals==2.2.0
 nbclient==0.10.2
-nbconvert==7.16.6
+nbconvert==7.17.1
 nbformat==5.10.4
 nest-asyncio==1.6.0
 notebook==7.4.5
@@ -91,12 +91,12 @@ pandas==2.3.2
 pandasql==0.7.3
 pandocfilters==1.5.1
 parso==0.8.5
-pillow==11.3.0
+pillow==12.2.0
 platformdirs==4.4.0
 plotly==6.3.0
 prometheus_client==0.22.1
 prompt_toolkit==3.0.52
-protobuf==6.31.1
+protobuf==6.33.5
 psutil==7.0.0
 pure_eval==0.2.3
 pyarrow==21.0.0
@@ -104,7 +104,7 @@ pycparser==2.22
 Pygments==2.19.2
 PyJWT==2.10.1
 pyodbc==5.2.0
-pyOpenSSL==25.1.0
+pyOpenSSL==26.0.0
 pyparsing==3.2.3
 pyreadstat==1.3.1
 python-dateutil==2.9.0.post0
@@ -116,7 +116,7 @@ pywinpty==3.0.0
 PyYAML==6.0.2
 pyzmq==27.0.2
 referencing==0.36.2
-requests==2.32.5
+requests==2.33.0
 rfc3339-validator==0.1.4
 rfc3986-validator==0.1.1
 rfc3987-syntax==1.1.0
@@ -137,14 +137,14 @@ terminado==0.18.1
 threadpoolctl==3.6.0
 tinycss2==1.4.0
 tomlkit==0.13.3
-tornado==6.5.2
+tornado==6.5.5
 traitlets==5.14.3
 types-python-dateutil==2.9.0.20250822
 typing_extensions==4.15.0
 tzdata==2025.2
 tzlocal==5.3.1
 uri-template==1.3.0
-urllib3==2.6.0
+urllib3==2.6.3
 wcwidth==0.2.13
 webcolors==24.11.1
 webencodings==0.5.1
