@@ -48,6 +48,9 @@ jobs:
     needs: check-first-run
     
     if: needs.check-first-run.outputs.should_run == 'true'
+    permissions:
+      contents: read
+      packages: read
     
     uses: DSACMS/repo-scaffolder/.github/workflows/extendJSONFile.yml@main
     with: 
